@@ -85,7 +85,7 @@
    },
    ```
 
-6. `webpack-dev-server` を立ち上げればだいたいシンプルなセットアップは完了します。
+6. `webpack-dev-server` を立ち上げればだいたいシンプルなセットアップは完了します。
 
    ```console
    $ yarn run dev
@@ -134,7 +134,7 @@
     * TODO フィルタテキストボックス
     * TODO リスト
       * TODO アイテム \* n 個
-  * TODO カウント表示
+  * TODO カウント表示
 
 だいたいどこに繰り返し項目が来るのかを意識すれば階層的に割れると思います。
 
@@ -147,7 +147,7 @@
   * TODO フィルタテキストボックス: `src/components/TodoFilter`
   * TODO リスト: `src/components/TodoList`
     * TODO アイテム \* n 個: `src/components/TodoList/TodoItem`
-  * TODO カウント表示: `src/components/TodoCounter`
+  * TODO カウント表示: `src/components/TodoCounter`
 
 上記が唯一の正解ではありません。見やすいやり方であれば問題ありません。
 
@@ -214,7 +214,7 @@ export const TodoInput = observer((props: { model: TodoInputVM }) => {
         placeholder="Todoを入れてね"
         onChange={ev => onTodoChanged(ev.currentTarget.value)}
       />
-      <button onChange={() => onAddTodo()}>追加</button>
+      <button onClick={() => onAddTodo()}>追加</button>
     </p>
   );
 });
@@ -278,11 +278,11 @@ export const TodoList = observer((props: { model: TodoListVM }) => {
 
 このように、コンポーネントの親子関係に呼応して、ビューモデル自体も親子関係を伴って定義されます。
 
-#### TODO フィルタテキストボックス
+#### 肉付け: TODO フィルタテキストボックス
 
 似たようなものなので省略。
 
-#### TODO アプリ全体
+#### 肉付け: TODO アプリ全体
 
 今まで作ってきた直下のコンポーネント及びビューモデルを組み合わせるだけです。
 
@@ -313,3 +313,55 @@ export const App = observer((props: { model: AppVM }) => {
   );
 });
 ```
+
+### ドメインを書く
+
+ちょっと脳みそを使いますが、ドメインを書いていきます。なんとなく、上で書いたコンポーネントの状態を拾えるものであれば OK としましょう。
+
+```typescript
+// src/domain/App.ts
+
+export class AppModel {
+  @observable todoInput: string = "";
+
+  @observable filterText: string = "";
+
+  @observable todoList: Todo[] = [];
+
+  addTodo() {
+    const todo = new Todo();
+    todo.done = false;
+    todo.todo = this.todoInput;
+    this.todoList.push(todo);
+  }
+
+  @computed
+  get filteredTodo(): Todo[] {
+    return this.todoList.filter(it => it.todo.indexOf(this.filterText) >= 0);
+  }
+
+  @computed
+  get allCount() {
+    return this.todoList.length;
+  }
+
+  @computed
+  get doneCount() {
+    return this.todoList.filter(it => it.done).length;
+  }
+}
+
+export class Todo {
+  @observable todo: string;
+  @observable done: boolean = false;
+}
+```
+
+それぞれ下記の mobx のデコレータがついています。
+
+* 変化するプロパティ： `@observable`
+* 変化したプロパティに応じて計算のし直しが必要なプロパティ： `@computed`
+
+### ビューモデルをドメインとつなぐ
+
+上記で作ったドメインを

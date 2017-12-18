@@ -18,7 +18,7 @@ export const TodoInput = observer((props: { model: TodoInputVM }) => {
         placeholder="Todoを入れてね"
         onChange={ev => onTodoChanged(ev.currentTarget.value)}
       />
-      <button onChange={() => onAddTodo()}>追加</button>
+      <button onClick={() => onAddTodo()}>追加</button>
     </p>
   );
 });

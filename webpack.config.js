@@ -22,6 +22,18 @@ module.exports = {
     filename: "app.js",
     publicPath: "/"
   },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?/,
+        loader: "awesome-typescript-loader"
+      }
+    ]
+  },
+  resolve: {
+    modules: [project.base("node_modules"), project.src()],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".css"]
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: project.src("index.html")
